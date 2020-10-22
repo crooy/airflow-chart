@@ -13,7 +13,7 @@ workflows:
       - airflow-test:
           matrix:
             parameters:
-              kube_version: ["1.14.10", "1.15.7", "1.16.4", "1.17.2", "1.18.2"]
+              kube_version: ["1.14.10", "1.15.12", "1.16.15", "1.17.11", "1.18.8"]
               executor: ["CeleryExecutor", "LocalExecutor", "KubernetesExecutor"]
           requires:
           - build-artifact
