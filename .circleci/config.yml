@@ -6,19 +6,20 @@ workflows:
     jobs:
       - lint
       - unittest-charts
-      - build-artifact:
+      - build-artifact-dev:
           requires:
           - lint
           - unittest-charts
+
       - airflow-test:
           matrix:
             parameters:
               kube_version: ["1.14.10", "1.15.12", "1.16.15", "1.17.11", "1.18.8"]
               executor: ["CeleryExecutor", "LocalExecutor", "KubernetesExecutor"]
           requires:
-          - build-artifact
+          - build-artifact-dev
 
-      - approve-release:
+      - approve-release-prod:
           type: approval
           requires:
             - 'airflow-test'
@@ -27,9 +28,15 @@ workflows:
               only:
                 - '/release-.*/'
 
+      - build-artifact-prod:
+        environment:
+          PROD_BUILD: "true"
+          requires:
+            - approve-release-prod
+
       - release:
           requires:
-            - approve-release
+            - build-artifact-prod
           filters:
             branches:
               only:
@@ -60,7 +67,20 @@ jobs:
             cp files/pod-template-file.yaml templates
             helm unittest .
 
-  build-artifact:
+  build-artifact-prod:
+    docker:
+      - image: alpine/helm:3.3.4
+    steps:
+      - checkout
+      - run:
+          name: Package the Airflow chart
+          command: bin/package
+      - persist_to_workspace:
+          root: /tmp/airflow-chart-package
+          paths:
+            - './*.tgz'
+
+  build-artifact-dev:
     docker:
       - image: alpine/helm:3.3.4
     steps:
