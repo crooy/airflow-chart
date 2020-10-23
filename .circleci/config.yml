@@ -11,6 +11,10 @@ workflows:
           - lint
           - unittest-charts
 
+      - release-internal:
+          requires:
+          - build-artifact-dev
+
       - airflow-test:
           matrix:
             parameters:
@@ -32,7 +36,7 @@ workflows:
           requires:
             - approve-release-prod
 
-      - release:
+      - release-prod:
           requires:
             - build-artifact-prod
           filters:
@@ -116,23 +120,33 @@ jobs:
             export EXECUTOR=<< parameters.executor >>
             HELM_CHART_PATH='/tmp/workspace/airflow-*.tgz' bin/run-ci
 
-  release:
-    machine:
-      image: ubuntu-2004:202008-01
+  release-internal:
+    docker:
+      - image: ubuntu:latest
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - checkout
+      - run:
+          name: Release the Airflow chart to internal
+          command: |
+            set -e
+            sudo apt-get update && sudo apt-get install -y ca-certificates curl python-is-python3
+            HELM_CHART_PATH='/tmp/workspace/airflow-*.tgz' bin/release
+
+  release-prod:
+    docker:
+      - image: ubuntu:latest
     steps:
       - attach_workspace:
           at: /tmp/workspace
       - checkout
       - publish-github-release
       - run:
-          name: Release the Airflow chart
+          name: Release the Airflow chart to public
           command: |
             set -e
-            sudo apt-get update && sudo apt-get install -y ca-certificates curl
-            pyenv global 3.8.5
-            # Make sure gcloud doesn't try to use python2 - pyenv installs a
-            # "stub" version that won't work unless we install it
-            export CLOUDSDK_PYTHON="$(pyenv which python)"
+            sudo apt-get update && sudo apt-get install -y ca-certificates curl python-is-python3
             HELM_CHART_PATH='/tmp/workspace/airflow-*.tgz' bin/release
 
 commands:
