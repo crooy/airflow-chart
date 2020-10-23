@@ -77,11 +77,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install bash
-          command: apk add bash
-      - run:
           name: Package the Airflow chart
-          command: bin/package
+          command: |
+            apk add bash
+            bin/package
       - persist_to_workspace:
           root: /tmp/airflow-chart-package
           paths:
