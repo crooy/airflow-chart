@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Purpose: Package the airflow helm chart. If running in CircleCI release branch, append '-build####' to the version.
 set -e
 
