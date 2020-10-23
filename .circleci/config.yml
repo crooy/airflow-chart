@@ -26,7 +26,7 @@ workflows:
           filters:
             branches:
               only:
-                - '/release-.*/'
+                - '/(release-[0-9]+\.[0-9]+|1997-push-to-internal-helm)/'
 
       - build-artifact-prod:
           requires:
@@ -38,7 +38,7 @@ workflows:
           filters:
             branches:
               only:
-                - '/release-.*/'
+                - '/(release-[0-9]+\.[0-9]+|1997-push-to-internal-helm)/'
 jobs:
   lint:
     docker:
