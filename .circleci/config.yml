@@ -46,7 +46,7 @@ workflows:
 jobs:
   lint:
     docker:
-      - image: alpine/helm:3.3.4
+      - image: alpine/helm:3.2.4
     steps:
       - checkout
       - run:
@@ -55,7 +55,7 @@ jobs:
 
   unittest-charts:
     docker:
-      - image: alpine/helm:3.3.4
+      - image: alpine/helm:3.2.4
         entrypoint: /bin/sh
     steps:
       - checkout
@@ -86,7 +86,7 @@ jobs:
 
   build-artifact-dev:
     docker:
-      - image: alpine/helm:3.3.4
+      - image: alpine/helm:3.2.4
     steps:
       - checkout
       - run:
