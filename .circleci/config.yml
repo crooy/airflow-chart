@@ -77,6 +77,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install bash
+          command: apk add bash
+      - run:
           name: Package the Airflow chart
           command: bin/package
       - persist_to_workspace:
