@@ -29,8 +29,6 @@ workflows:
                 - '/release-.*/'
 
       - build-artifact-prod:
-        environment:
-          PROD_BUILD: "true"
           requires:
             - approve-release-prod
 
@@ -70,6 +68,8 @@ jobs:
   build-artifact-prod:
     docker:
       - image: alpine/helm:3.3.4
+    environment:
+      PROD_BUILD: "true"
     steps:
       - checkout
       - run:

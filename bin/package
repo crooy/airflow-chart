@@ -2,12 +2,7 @@
 # Purpose: Package the airflow helm chart. If running in CircleCI release branch, append '-build####' to the version.
 set -e
 
-dest_dir="/tmp/airflow-chart-package"
-rm -rf "${dest_dir}" || true
-mkdir -p "${dest_dir}"
-
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
-temp_dir=$(mktemp -d)
 
 extra_args=()
 if [[ "$CIRCLE_STAGE" == build-artifact-dev ]] ; then
@@ -15,7 +10,10 @@ if [[ "$CIRCLE_STAGE" == build-artifact-dev ]] ; then
   extra_args+=( --version "$(awk '$1 ~ /^version/ {printf "%s-build%s\n", $2, ENVIRON["CIRCLE_BUILD_NUM"]}' Chart.yaml)" )
 fi
 
-# helm uses the dir name as the package name
-cp -R . "${temp_dir}/airflow"
-cd "${temp_dir}"
+dest_dir="/tmp/airflow-chart-package"
+rm -rf "${dest_dir}" || true
+mkdir -p "${dest_dir}"
+cp -R . "${dest_dir}/airflow"
+cd "${dest_dir}"
+
 helm package airflow --dependency-update --destination "$dest_dir" "${extra_args[@]}"
