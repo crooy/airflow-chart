@@ -18,6 +18,7 @@ workflows:
       - airflow-test:
           matrix:
             parameters:
+              # https://hub.docker.com/r/kindest/node/tags
               kube_version: ["1.14.10", "1.15.12", "1.16.15", "1.17.11", "1.18.8"]
               executor: ["CeleryExecutor", "LocalExecutor", "KubernetesExecutor"]
           requires:
@@ -111,7 +112,7 @@ jobs:
         default: "LocalExecutor"
       kube_version:
         type: string
-        default: "1.18.2"
+        default: "1.18.8"
     steps:
       - attach_workspace:
           at: /tmp/workspace
