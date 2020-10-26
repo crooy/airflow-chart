@@ -69,11 +69,9 @@ jobs:
             cp files/pod-template-file.yaml templates
             helm unittest .
 
-  build-artifact-prod:
+  build-artifact-dev:
     docker:
-      - image: alpine/helm:3.3.4
-    environment:
-      PROD_BUILD: "true"
+      - image: alpine/helm:3.2.4
     steps:
       - checkout
       - run:
@@ -86,9 +84,11 @@ jobs:
           paths:
             - './*.tgz'
 
-  build-artifact-dev:
+  build-artifact-prod:
     docker:
       - image: alpine/helm:3.2.4
+    environment:
+      PROD_BUILD: "true"
     steps:
       - checkout
       - run:
