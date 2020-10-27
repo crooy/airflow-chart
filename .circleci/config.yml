@@ -129,6 +129,9 @@ jobs:
     docker:
       - image: ubuntu:latest
     steps:
+      - run:
+          name: Install ca-certificates
+          command: sudo apt-get update && sudo apt-get install -y ca-certificates curl python-is-python3
       - attach_workspace:
           at: /tmp/workspace
       - checkout
@@ -136,13 +139,15 @@ jobs:
           name: Release the Airflow chart to internal
           command: |
             set -e
-            sudo apt-get update && sudo apt-get install -y ca-certificates curl python-is-python3
             HELM_CHART_PATH='/tmp/workspace/airflow-*.tgz' bin/release
 
   release-prod:
     docker:
       - image: ubuntu:latest
     steps:
+      - run:
+          name: Install ca-certificates
+          command: sudo apt-get update && sudo apt-get install -y ca-certificates curl python-is-python3
       - attach_workspace:
           at: /tmp/workspace
       - checkout
@@ -151,7 +156,6 @@ jobs:
           name: Release the Airflow chart to public
           command: |
             set -e
-            sudo apt-get update && sudo apt-get install -y ca-certificates curl python-is-python3
             HELM_CHART_PATH='/tmp/workspace/airflow-*.tgz' bin/release
 
 commands:
