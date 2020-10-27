@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# shellcheck disable=SC1090
 set -e
 
 if [[ -z "${HELM_CHART_PATH}" ]]; then
@@ -7,9 +7,8 @@ if [[ -z "${HELM_CHART_PATH}" ]]; then
   exit 1
 fi
 
-# Common bash line that sets DIR to the directory of this script
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-REPO_DIR=$DIR/../
+# Common bash line that sets BIN_DIR to the directory of this script
+BIN_DIR="${0%/*}"
 
 # Wed don't need kubectl or kind, so
 # touching placeholders to skip
@@ -17,17 +16,17 @@ REPO_DIR=$DIR/../
 mkdir -p /tmp/bin
 touch /tmp/bin/kubectl
 touch /tmp/bin/kind
-source $DIR/install-ci-tools
+source "$BIN_DIR/install-ci-tools"
 
 # Install other CLI tools for releasing
 OS=$(uname | tr '[:upper:]' '[:lower:]')
 GCLOUD_VERSION="270.0.0"
 CURRENT_DIR=$(pwd)
 cd /tmp
-wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-${OS}-x86_64.tar.gz
-tar xvzf ./google-cloud-sdk-${GCLOUD_VERSION}-${OS}-x86_64.tar.gz >/dev/null 2>&1
-export PATH=$(pwd)/google-cloud-sdk/bin/:$PATH
-cd $CURRENT_DIR
+curl -SLo google-cloud-sdk.tgz "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-${OS}-x86_64.tar.gz"
+tar -xvzf ./google-cloud-sdk.tgz
+export PATH="${PWD}/google-cloud-sdk/bin/:$PATH"
+cd "$CURRENT_DIR"
 sudo apt-get update > /dev/null
 sudo apt-get install -y tree > /dev/null
 
@@ -37,10 +36,10 @@ mkdir -p /tmp/airflow-chart-release
 cd /tmp/airflow-chart-release
 
 # Copy the artifact
-cp $HELM_CHART_PATH .
+cp "$HELM_CHART_PATH" .
 
 # Unzip the artifact
-tar -xvzf $HELM_CHART_PATH -C .
+tar -xvzf "$HELM_CHART_PATH" -C .
 
 echo ""
 echo "========================="
@@ -62,15 +61,15 @@ set +x
 # gcloud configurations.
 export BOTO_CONFIG=/dev/null
 
-echo ${GCP_TOKEN} > /tmp/gcs_token.json
+echo "${GCP_TOKEN}" > /tmp/gcs_token.json
 gcloud auth activate-service-account --key-file=/tmp/gcs_token.json
 
 set -xe
 
 # Set up the index.html file
-wget https://helm.astronomer.io/index.yaml -O /tmp/index.yaml.current
+curl -o /tmp/index.yaml.current https://helm.astronomer.io/index.yaml
 helm repo index . --url https://helm.astronomer.io --merge /tmp/index.yaml.current
-gsutil cp $HELM_CHART_PATH gs://helm.astronomer.io
+gsutil cp "$HELM_CHART_PATH gs://helm.astronomer.io"
 gsutil cp ./index.yaml gs://helm.astronomer.io
 
 set +x
