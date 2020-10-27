@@ -131,7 +131,7 @@ jobs:
     steps:
       - run:
           name: Install ca-certificates
-          command: sudo apt-get update && sudo apt-get install -y ca-certificates curl python-is-python3
+          command: apt-get update && apt-get install -y ca-certificates curl python-is-python3
       - attach_workspace:
           at: /tmp/workspace
       - checkout
@@ -147,7 +147,7 @@ jobs:
     steps:
       - run:
           name: Install ca-certificates
-          command: sudo apt-get update && sudo apt-get install -y ca-certificates curl python-is-python3
+          command: apt-get update && apt-get install -y ca-certificates curl python-is-python3
       - attach_workspace:
           at: /tmp/workspace
       - checkout
