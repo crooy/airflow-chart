@@ -24,7 +24,7 @@ GCLOUD_VERSION="270.0.0"
 CURRENT_DIR=$(pwd)
 cd /tmp
 curl -SLo google-cloud-sdk.tgz "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-${OS}-x86_64.tar.gz"
-tar -xvzf ./google-cloud-sdk.tgz
+tar -xzf ./google-cloud-sdk.tgz
 export PATH="${PWD}/google-cloud-sdk/bin/:$PATH"
 cd "$CURRENT_DIR"
 sudo apt-get update > /dev/null
