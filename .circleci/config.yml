@@ -123,7 +123,9 @@ jobs:
             pyenv global 3.8.5
             export KUBE_VERSION=<< parameters.kube_version >>
             export EXECUTOR=<< parameters.executor >>
-            HELM_CHART_PATH='/tmp/workspace/airflow-*.tgz' bin/run-ci
+            HELM_CHART_PATH=$(find /tmp/workspace/ -name 'airflow-*.tgz')
+            export HELM_CHART_PATH
+            bin/run-ci
 
   release-internal:
     docker:
@@ -139,7 +141,9 @@ jobs:
           name: Release the Airflow chart to internal
           command: |
             set -e
-            HELM_CHART_PATH='/tmp/workspace/airflow-*.tgz' bin/release
+            HELM_CHART_PATH=$(find /tmp/workspace/ -name 'airflow-*.tgz')
+            export HELM_CHART_PATH
+            bin/release
 
   release-prod:
     docker:
@@ -156,7 +160,9 @@ jobs:
           name: Release the Airflow chart to public
           command: |
             set -e
-            HELM_CHART_PATH='/tmp/workspace/airflow-*.tgz' bin/release
+            HELM_CHART_PATH=$(find /tmp/workspace/ -name 'airflow-*.tgz')
+            export HELM_CHART_PATH
+            bin/release
 
 commands:
   publish-github-release:
